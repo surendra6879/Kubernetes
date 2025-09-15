@@ -1,38 +1,31 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: my-app
+  name: nginx
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: my-app
+      app: nginx
   template:
     metadata:
       labels:
-        app: my-app
+        app: nginx
     spec:
       containers:
       - name: app-container
-        image: my-app-image
+        image: nginx:latest
+        volumeMounts:
+          - name: config-volume
+            mountPath: /etc/db-config    # You can choose any mount path
+            readOnly: true
         env:
-          - name: DB_HOST
-            valueFrom:
-              configMapKeyRef:
-                name: db-config
-                key: DB_HOST
           - name: DB_PORT
             valueFrom:
               configMapKeyRef:
                 name: db-config
                 key: DB_PORT
-          - name: DB_USER
-            valueFrom:
-              configMapKeyRef:
-                name: db-config
-                key: DB_USER
-          - name: DB_PASSWORD
-            valueFrom:
-              configMapKeyRef:
-                name: db-config
-                key: DB_PASSWORD
+      volumes:
+        - name: config-volume
+          configMap:
+            name: db-config
